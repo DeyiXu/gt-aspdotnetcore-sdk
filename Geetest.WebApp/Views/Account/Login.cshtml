@@ -1,0 +1,55 @@
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Login</h2>
+
+<h2>@Html.ValidationSummary(true, "", new { @class = "text-danger" })</h2>
+<form method="post">
+    userName:(admin) <input class="input-group" name="name" />
+    <br />
+    <br />
+    password:(admin) <input class="input-group" type="password" name="pass" />
+    <br />
+    <br />
+    <div id="captcha"></div>
+    <br />
+    <br />
+    <button class="btn btn-primary" type="submit">submit</button>
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+</form>
+
+@section scripts{
+    <script src="http://static.geetest.com/static/tools/gt.js"></script>
+    <script type="text/javascript">
+        var handler = function (captchaObj) {
+            // 将验证码加到id为captcha的元素里
+            captchaObj.appendTo("#captcha");
+        };
+        $.ajax({
+            // 获取id，challenge，success（是否启用failback）
+            url: "/Account/GetCaptcha?t=" + (new Date()).getTime(),
+            type: "get",
+            dataType: "json", // 使用jsonp格式
+            success: function (data) {
+                // 使用initGeetest接口
+                // 参数1：配置参数，与创建Geetest实例时接受的参数一致
+                // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+                initGeetest({
+                    gt: data.gt,
+                    challenge: data.challenge,
+                    product: "float", // 产品形式
+                    offline: !data.success
+                }, handler);
+            }
+        });
+    </script>
+}
